@@ -9,15 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request bodies
 
-// Define the /bfhl POST route
+// POST method endpoint
 app.post('/bfhl', (req, res) => {
     const data = req.body.data;
 
-    if (data) {
+    if (data && Array.isArray(data)) {
         // Process data
         const numbers = data.filter(item => /^\d+$/.test(item)); // Extract digits
-        const alphabets = data.filter(item => /^[a-zA-Z]$/.test(item)).map(item => item.toLowerCase()); // Extract alphabets and convert to lowercase
-        const highestLowercaseAlphabet = alphabets.length ? [String.fromCharCode(Math.max(...alphabets.map(c => c.charCodeAt(0))))] : [];
+        const alphabets = data.filter(item => /^[a-zA-Z]$/.test(item)).map(item => item.toUpperCase()); // Extract alphabets and convert to uppercase
+        const lowercaseAlphabets = data.filter(item => /^[a-z]$/.test(item)); // Filter lowercase alphabets
+        const highestLowercaseAlphabet = lowercaseAlphabets.length 
+            ? [String.fromCharCode(Math.max(...lowercaseAlphabets.map(char => char.charCodeAt(0))))] 
+            : [];
 
         const response = {
             is_success: true,
@@ -35,19 +38,13 @@ app.post('/bfhl', (req, res) => {
     }
 });
 
-// Define the /bfhl GET route
+// GET method endpoint
 app.get('/bfhl', (req, res) => {
     res.json({ operation_code: 1 });
 });
 
-// Add a default route for the root path
-app.get('/', (req, res) => {
-    res.send('Welcome to the backend API!');
-});
-
-// Define port and start server
+// Start the server (optional if running locally)
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
